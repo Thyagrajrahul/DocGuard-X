@@ -1,0 +1,31 @@
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Local database
+instance/
+
+# Large healthcare dataset
+dataset/*.csv
+
+# Generated model files
+*.pkl
+*.joblib
+
+# Temporary files
+*.log
+.DS_Store
+
+# Generated experimental datasets
+data/*.csv
+
+# Generated machine learning models
+data/*.pkl

@@ -1,0 +1,62 @@
+[
+  {
+    "model":"Random Forest",
+    "precision":0.2912036784,
+    "recall":0.6783118705,
+    "f1":0.4074754902,
+    "accuracy":0.9033,
+    "false_positive_rate":0.0851028871,
+    "average_precision":0.4542630533,
+    "roc_auc":0.8991322627,
+    "TN":139208,
+    "FP":12949,
+    "FN":2523,
+    "TP":5320,
+    "evaluation_note":"Supervised; trained using risk_label; threshold=0.50."
+  },
+  {
+    "model":"HistGradientBoosting",
+    "precision":0.7136465324,
+    "recall":0.2847124825,
+    "f1":0.4070360919,
+    "accuracy":0.9593375,
+    "false_positive_rate":0.0058886545,
+    "average_precision":0.5060295108,
+    "roc_auc":0.9057435467,
+    "TN":151261,
+    "FP":896,
+    "FN":5610,
+    "TP":2233,
+    "evaluation_note":"Supervised; trained using risk_label; threshold=0.50."
+  },
+  {
+    "model":"Isolation Forest",
+    "precision":0.1148684211,
+    "recall":0.2226188958,
+    "f1":0.1515427679,
+    "accuracy":0.87780625,
+    "false_positive_rate":0.0884218275,
+    "average_precision":0.1582442493,
+    "roc_auc":0.6471109138,
+    "TN":138703,
+    "FP":13454,
+    "FN":6097,
+    "TP":1746,
+    "evaluation_note":"Unsupervised; 5% contamination threshold; labels used only for evaluation."
+  },
+  {
+    "model":"Local Outlier Factor",
+    "precision":0.0511921459,
+    "recall":0.7285429142,
+    "f1":0.0956624296,
+    "accuracy":0.3099,
+    "false_positive_rate":0.7121802295,
+    "average_precision":0.0539674602,
+    "roc_auc":0.5145857354,
+    "TN":2734,
+    "FP":6765,
+    "FN":136,
+    "TP":365,
+    "evaluation_note":"Unsupervised; random reproducible test sample of 10,000; training cap 20,000; 5% contamination."
+  }
+]
