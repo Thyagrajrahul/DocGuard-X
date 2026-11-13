@@ -5,6 +5,10 @@ from app.database import db
 from app.auth.security import verify_password
 
 auth_bp = Blueprint("auth", __name__)
+@auth_bp.route("/login", methods=["GET"])
+def login_page():
+    from flask import render_template
+    return render_template("login.html")
 
 
 @auth_bp.route("/login", methods=["POST"])

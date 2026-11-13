@@ -1,0 +1,868 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | DocGuard-X{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">
+            DocGuard-X
+        </a>
+
+        <div class="ms-auto">
+            <span class="text-white me-3">Administrator</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">
+                Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+
+        <!-- Dashboard Header -->
+        <div class="mb-4">
+            <h2 class="fw-bold">Admin Dashboard</h2>
+            <p class="text-muted">
+                Healthcare Security Monitoring and Management
+            </p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Total Doctors</p>
+                        <h3>{{ total_doctors }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Total Patients</p>
+                        <h3>{{ total_patients }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Active Assignments</p>
+                        <h3>{{ active_assignments }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Security Events</p>
+                        <h3>{{ total_security_events }}</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Management Cards -->
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            Doctor and Patient Management
+                        </h5>
+
+                        <p class="text-muted">
+                            Manage doctor-patient assignments and
+                            monitor authorized access.
+                        </p>
+
+                        <a href="/admin/assignments"
+                           class="btn btn-primary">
+                            View Assignments
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            AI Traffic Monitoring
+                        </h5>
+
+                        <p class="text-muted">
+                            Analyze healthcare data-exchange traffic
+                            using the trained AI model.
+                        </p>
+
+                        <span class="badge bg-success">
+                            HistGradientBoosting Model Available
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Manual AI Traffic Analysis -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-2">
+                    AI Healthcare Traffic Analysis
+                </h5>
+
+                <p class="text-muted">
+                    Submit a healthcare traffic event for AI analysis.
+                </p>
+
+                <form id="trafficAnalysisForm">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Timestamp</label>
+                            <input type="datetime-local"
+                                   step="1"
+                                   class="form-control"
+                                   name="timestamp"
+                                   value="2024-03-30T11:38:51"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Hospital ID</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="hospital_id"
+                                   value="ciming"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Data Volume (KB)</label>
+                            <input type="number"
+                                   step="any"
+                                   min="0"
+                                   class="form-control"
+                                   name="volume_kb"
+                                   value="7.41"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Latency (ms)</label>
+                            <input type="number"
+                                   step="any"
+                                   min="0"
+                                   class="form-control"
+                                   name="latency_ms"
+                                   value="26.80"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Trusted Network Line
+                            </label>
+
+                            <select class="form-select"
+                                    name="is_trusted_line"
+                                    required>
+                                <option value="false" selected>False</option>
+                                <option value="true">True</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Destination Platform
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   name="dest_platform"
+                                   value="san_yi"
+                                   required>
+                        </div>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary mt-4"
+                            id="analyzeTrafficButton">
+                        Analyze Using AI
+                    </button>
+
+                </form>
+
+                <!-- Manual Prediction Result -->
+                <div id="trafficPredictionResult"
+                     class="mt-4"
+                     style="display:none;">
+
+                    <hr>
+
+                    <h5 class="fw-bold">AI Prediction Result</h5>
+
+                    <p id="predictionClassification"
+                       class="fw-bold fs-5"></p>
+
+                    <p id="predictionProbability"></p>
+
+                    <p id="predictionThreshold"></p>
+
+                    <h6 class="fw-bold mt-3">
+                        Explanation
+                    </h6>
+
+                    <ul id="predictionIndicators"></ul>
+
+                    <p id="predictionWarning"
+                       class="text-muted small"></p>
+
+                </div>
+
+                <div id="trafficPredictionError"
+                     class="alert alert-danger mt-3"
+                     style="display:none;">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Dataset Batch Analysis -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-2">
+                    AI Dataset Batch Analysis
+                </h5>
+
+                <p class="text-muted">
+                    Analyze multiple healthcare traffic records from
+                    the dataset and evaluate the trained AI model.
+                </p>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="batchMaxRecords"
+                               class="form-label">
+                            Number of Records
+                        </label>
+
+                        <select id="batchMaxRecords"
+                                class="form-select">
+                            <option value="100">100 Records</option>
+                            <option value="500">500 Records</option>
+                            <option value="1000" selected>
+                                1,000 Records
+                            </option>
+                            <option value="5000">5,000 Records</option>
+                            <option value="10000">10,000 Records</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="batchThreshold"
+                               class="form-label">
+                            Threshold Strategy
+                        </label>
+
+                        <select id="batchThreshold"
+                                class="form-select">
+                            <option value="best_f1">
+                                Best F1 Score
+                            </option>
+                            <option value="lower_fpr">
+                                Lower False Positive Rate
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        id="runBatchAnalysisButton"
+                        class="btn btn-dark mt-4">
+                    Run Dataset Analysis
+                </button>
+
+                <div id="batchAnalysisError"
+                     class="alert alert-danger mt-3"
+                     style="display:none;">
+                </div>
+
+                <div id="batchAnalysisLoading"
+                     class="alert alert-info mt-3"
+                     style="display:none;">
+                    Analyzing dataset records. Please wait...
+                </div>
+
+                <!-- Batch Results -->
+                <div id="batchAnalysisResult"
+                     class="mt-4"
+                     style="display:none;">
+
+                    <hr>
+
+                    <h5 class="fw-bold">
+                        Dataset Analysis Results
+                    </h5>
+
+                    <div class="row g-3 mt-2">
+
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">
+                                        Records Analyzed
+                                    </p>
+                                    <h4 id="batchRecordsAnalyzed">-</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">
+                                        Normal Records
+                                    </p>
+                                    <h4 id="batchNormalCount">-</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">
+                                        Anomaly Records
+                                    </p>
+                                    <h4 id="batchAnomalyCount">-</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <h6 class="fw-bold mt-4">
+                        Model Evaluation Metrics
+                    </h6>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>Model</td>
+                                    <td id="batchModelName">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Threshold Strategy</td>
+                                    <td id="batchStrategy">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Decision Threshold</td>
+                                    <td id="batchThresholdValue">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Precision</td>
+                                    <td id="batchPrecision">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Recall</td>
+                                    <td id="batchRecall">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>F1 Score</td>
+                                    <td id="batchF1">-</td>
+                                </tr>
+
+                                <tr>
+                                    <td>False Positive Rate</td>
+                                    <td id="batchFpr">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4">
+                        Confusion Matrix
+                    </h6>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Predicted Normal</th>
+                                    <th>Predicted Anomaly</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <th>Actual Normal</th>
+                                    <td id="batchTN">-</td>
+                                    <td id="batchFP">-</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Actual Anomaly</th>
+                                    <td id="batchFN">-</td>
+                                    <td id="batchTP">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4">
+                        Highest Risk Records
+                    </h6>
+
+                    <p class="text-muted small">
+                        These are the records with the highest predicted
+                        anomaly probabilities in this batch.
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Hospital</th>
+                                    <th>Volume (KB)</th>
+                                    <th>Latency (ms)</th>
+                                    <th>Anomaly Probability</th>
+                                    <th>Explanation</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="batchHighestRiskRecords">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="text-muted small mt-3">
+                        Note: These results evaluate the selected dataset
+                        batch against its labels. They are not a substitute
+                        for final evaluation on an untouched test dataset.
+                        An anomaly prediction is not proof of malicious
+                        activity.
+                    </p>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Recent Security Events -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    Recent Security Events
+                </h5>
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event ID</th>
+                                <th>Event Type</th>
+                                <th>Action</th>
+                                <th>Reason</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% if recent_security_events %}
+
+                                {% for event in recent_security_events %}
+
+                                <tr>
+                                    <td>{{ event.id }}</td>
+
+                                    <td>
+                                        {% if event.event_type == "ACCESS_DENIED" %}
+                                            <span class="badge bg-danger">
+                                                {{ event.event_type }}
+                                            </span>
+                                        {% elif event.event_type == "INVALID_ACTION" %}
+                                            <span class="badge bg-warning text-dark">
+                                                {{ event.event_type }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ event.event_type }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>{{ event.action }}</td>
+                                    <td>{{ event.reason }}</td>
+
+                                    <td>
+                                        {% if event.timestamp %}
+                                            {{ event.timestamp.strftime("%d-%m-%Y %H:%M:%S") }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <tr>
+                                    <td colspan="5"
+                                        class="text-center text-muted py-4">
+                                        No security events recorded yet.
+                                    </td>
+                                </tr>
+
+                            {% endif %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // -----------------------------------------
+    // 1. Manual AI Traffic Analysis
+    // -----------------------------------------
+
+    const form = document.getElementById("trafficAnalysisForm");
+    const button = document.getElementById("analyzeTrafficButton");
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const formData = new FormData(form);
+
+        const trafficEvent = {
+            timestamp: formData.get("timestamp").replace("T", " "),
+            hospital_id: formData.get("hospital_id").trim(),
+            volume_kb: Number(formData.get("volume_kb")),
+            latency_ms: Number(formData.get("latency_ms")),
+            is_trusted_line: formData.get("is_trusted_line") === "true",
+            dest_platform: formData.get("dest_platform").trim()
+        };
+
+        const resultBox = document.getElementById(
+            "trafficPredictionResult"
+        );
+
+        const errorBox = document.getElementById(
+            "trafficPredictionError"
+        );
+
+        resultBox.style.display = "none";
+        errorBox.style.display = "none";
+
+        button.disabled = true;
+        button.textContent = "Analyzing...";
+
+        try {
+
+            const response = await fetch("/admin/traffic/analyze", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(trafficEvent)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "AI analysis failed."
+                );
+            }
+
+            const prediction = data.result.prediction;
+            const explanation = data.result.explanation;
+
+            document.getElementById(
+                "predictionClassification"
+            ).textContent = prediction.classification;
+
+            document.getElementById(
+                "predictionProbability"
+            ).textContent =
+                "Anomaly Probability: " +
+                (prediction.anomaly_probability * 100).toFixed(2) +
+                "%";
+
+            document.getElementById(
+                "predictionThreshold"
+            ).textContent =
+                "Decision Threshold: " +
+                prediction.threshold +
+                " (" + prediction.threshold_strategy + ")";
+
+            const indicatorList = document.getElementById(
+                "predictionIndicators"
+            );
+
+            indicatorList.replaceChildren();
+
+            explanation.indicators.forEach(function (indicator) {
+
+                const item = document.createElement("li");
+                item.textContent = indicator;
+                indicatorList.appendChild(item);
+
+            });
+
+            document.getElementById(
+                "predictionWarning"
+            ).textContent = explanation.warning;
+
+            resultBox.style.display = "block";
+
+        } catch (error) {
+
+            errorBox.textContent = error.message;
+            errorBox.style.display = "block";
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "Analyze Using AI";
+
+        }
+
+    });
+
+
+    // -----------------------------------------
+    // 2. Dataset Batch Analysis
+    // -----------------------------------------
+
+    const batchButton = document.getElementById(
+        "runBatchAnalysisButton"
+    );
+
+    const batchResultBox = document.getElementById(
+        "batchAnalysisResult"
+    );
+
+    const batchErrorBox = document.getElementById(
+        "batchAnalysisError"
+    );
+
+    const batchLoadingBox = document.getElementById(
+        "batchAnalysisLoading"
+    );
+
+    function setText(id, value) {
+        document.getElementById(id).textContent =
+            value === null || value === undefined ? "-" : value;
+    }
+
+    function formatMetric(value) {
+        if (value === null || value === undefined) {
+            return "-";
+        }
+
+        return (Number(value) * 100).toFixed(2) + "%";
+    }
+
+    batchButton.addEventListener("click", async function () {
+
+        const maxRecords = Number(
+            document.getElementById("batchMaxRecords").value
+        );
+
+        const thresholdStrategy = document.getElementById(
+            "batchThreshold"
+        ).value;
+
+        batchResultBox.style.display = "none";
+        batchErrorBox.style.display = "none";
+        batchLoadingBox.style.display = "block";
+
+        batchButton.disabled = true;
+        batchButton.textContent = "Analyzing Dataset...";
+
+        try {
+
+            const response = await fetch(
+                "/admin/traffic/batch-analyze",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        max_records: maxRecords,
+                        threshold_strategy: thresholdStrategy
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Batch analysis failed."
+                );
+            }
+
+            const result = data.result;
+            const evaluation = result.evaluation || {};
+
+            // Dataset summary
+            setText("batchRecordsAnalyzed", result.records_analyzed);
+            setText("batchNormalCount", result.normal_count);
+            setText("batchAnomalyCount", result.anomaly_count);
+
+            // Model information
+            setText("batchModelName", result.model_name);
+            setText("batchStrategy", result.threshold_strategy);
+            setText("batchThresholdValue", result.threshold);
+
+            // Evaluation metrics
+            setText("batchPrecision", formatMetric(evaluation.precision));
+            setText("batchRecall", formatMetric(evaluation.recall));
+            setText("batchF1", formatMetric(evaluation.f1_score));
+            setText(
+                "batchFpr",
+                formatMetric(evaluation.false_positive_rate)
+            );
+
+            // Confusion matrix
+            setText("batchTN", evaluation.true_negatives);
+            setText("batchFP", evaluation.false_positives);
+            setText("batchFN", evaluation.false_negatives);
+            setText("batchTP", evaluation.true_positives);
+
+            // Highest risk records
+            const recordsTable = document.getElementById(
+                "batchHighestRiskRecords"
+            );
+
+            recordsTable.replaceChildren();
+
+            const records = result.highest_risk_records || [];
+
+            if (records.length === 0) {
+
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+
+                cell.colSpan = 6;
+                cell.className = "text-center text-muted";
+                cell.textContent = "No records available.";
+
+                row.appendChild(cell);
+                recordsTable.appendChild(row);
+
+            } else {
+
+                records.forEach(function (record) {
+
+                    const row = document.createElement("tr");
+
+                    const values = [
+                        record.timestamp,
+                        record.hospital_id,
+                        record.volume_kb,
+                        record.latency_ms,
+                        record.anomaly_probability,
+                        record.explanation
+                    ];
+
+                    values.forEach(function (value, index) {
+
+                        const cell = document.createElement("td");
+
+                        if (index === 4 && value !== undefined) {
+                            cell.textContent =
+                                (Number(value) * 100).toFixed(2) + "%";
+                        } else if (index === 5 && Array.isArray(value)) {
+                            cell.textContent = value.join("; ");
+                        } else {
+                            cell.textContent =
+                                value === null || value === undefined
+                                    ? "-"
+                                    : String(value);
+                        }
+
+                        row.appendChild(cell);
+
+                    });
+
+                    recordsTable.appendChild(row);
+
+                });
+
+            }
+
+            batchResultBox.style.display = "block";
+
+        } catch (error) {
+
+            batchErrorBox.textContent = error.message;
+            batchErrorBox.style.display = "block";
+
+        } finally {
+
+            batchLoadingBox.style.display = "none";
+
+            batchButton.disabled = false;
+            batchButton.textContent = "Run Dataset Analysis";
+
+        }
+
+    });
+
+});
+</script>
+
+{% endblock %}

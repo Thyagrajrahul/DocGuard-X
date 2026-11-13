@@ -1,0 +1,111 @@
+
+{% extends "base.html" %}
+
+{% block title %}Login | DocGuard-X{% endblock %}
+
+{% block content %}
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            <h2>DocGuard<span>-X</span></h2>
+            <p>Healthcare Security Monitoring Platform</p>
+        </div>
+
+        <h4>Welcome Back</h4>
+        <p class="login-subtitle">Sign in to access your secure workspace.</p>
+
+        <form id="loginForm">
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    placeholder="Enter your username"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <div id="loginMessage" class="alert d-none"></div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="login-footer">
+            <small>Protected Healthcare Security Environment</small>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("loginMessage");
+
+    try {
+
+        const response = await fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            message.className = "alert alert-danger";
+            message.textContent = result.message;
+            return;
+        }
+
+        if (result.role === "admin") {
+            window.location.href = "/admin/dashboard";
+        } else if (result.role === "doctor") {
+            window.location.href = "/doctor/dashboard";
+        } else {
+            message.className = "alert alert-warning";
+            message.textContent = "Unknown account role.";
+        }
+
+    } catch (error) {
+
+        message.className = "alert alert-danger";
+        message.textContent = "Unable to connect to the server.";
+
+    }
+
+});
+</script>
+{% endblock %}

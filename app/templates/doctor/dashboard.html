@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - DocGuard-X{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <h2>Doctor Dashboard</h2>
+        <p class="text-muted">
+            Welcome, Dr. {{ doctor.full_name }}
+        </p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Your Profile</h5>
+            <p><strong>Doctor Code:</strong> {{ doctor.doctor_code }}</p>
+            <p><strong>Department:</strong> {{ doctor.department }}</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h5 class="card-title mb-3">
+                Your Assigned Patients
+            </h5>
+
+            {% if patients %}
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Patient Code</th>
+                            <th>Patient Name</th>
+                            <th>Department</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.patient_code }}</td>
+                            <td>{{ patient.full_name }}</td>
+                            <td>{{ patient.department }}</td>
+                            <td>
+                                <a
+                                    href="{{ url_for('doctor.view_patient', patient_id=patient.id) }}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    View Record
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            {% else %}
+
+            <div class="alert alert-info">
+                No active patient assignments found.
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

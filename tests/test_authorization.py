@@ -157,3 +157,97 @@ def test_expired_assignment_is_denied(app, setup_data):
 
     assert allowed is False
     assert message == "Doctor assignment has expired"
+
+
+def test_admin_cannot_access_patient(app, setup_data):
+    admin = User(
+        username="admin1",
+        email="admin@test.com",
+        password_hash=hash_password("test123"),
+        role="admin",
+        is_active=True
+    )
+    db.session.add(admin)
+    db.session.commit()
+
+    allowed, message = check_patient_access(
+        admin.id,
+        setup_data["patient_id"]
+    )
+
+    assert allowed is False
+    assert message == "Only doctors can access patient records"
+
+
+def test_nonexistent_user_is_denied(app, setup_data):
+    allowed, message = check_patient_access(
+        99999,
+        setup_data["patient_id"]
+    )
+
+    assert allowed is False
+    assert message == "User account is invalid or inactive"
+
+
+def test_nonexistent_patient_is_denied(app, setup_data):
+    allowed, message = check_patient_access(
+        setup_data["doctor_user_id"],
+        99999
+    )
+
+    assert allowed is False
+    assert message == "Patient record is invalid or inactive"
+
+
+def test_inactive_patient_is_denied(app, setup_data):
+    patient = db.session.get(
+        Patient,
+        setup_data["patient_id"]
+    )
+    patient.is_active = False
+    db.session.commit()
+
+    allowed, message = check_patient_access(
+        setup_data["doctor_user_id"],
+        setup_data["patient_id"]
+    )
+
+    assert allowed is False
+    assert message == "Patient record is invalid or inactive"
+
+
+def test_inactive_doctor_profile_is_denied(app, setup_data):
+    doctor = Doctor.query.filter_by(
+        user_id=setup_data["doctor_user_id"]
+    ).first()
+
+    doctor.is_active = False
+    db.session.commit()
+
+    allowed, message = check_patient_access(
+        setup_data["doctor_user_id"],
+        setup_data["patient_id"]
+    )
+
+    assert allowed is False
+    assert message == "Active doctor profile not found"
+
+
+def test_future_assignment_is_denied(app, setup_data):
+    assignment = db.session.get(
+        DoctorPatientAssignment,
+        setup_data["assignment_id"]
+    )
+
+    assignment.assigned_at = (
+        datetime.now(timezone.utc) + timedelta(days=1)
+    )
+    db.session.commit()
+
+    allowed, message = check_patient_access(
+        setup_data["doctor_user_id"],
+        setup_data["patient_id"]
+    )
+
+    assert allowed is False
+    assert message == "Assignment is not yet valid"
